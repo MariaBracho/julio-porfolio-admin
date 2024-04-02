@@ -9,7 +9,7 @@ import {
 import useSupabaseBrowser from "@/utils/supabase-browser";
 
 import { TOAST_MESSAGES } from "@/constants/toastMessage";
-import { CERTIFICATE_TABLE } from "../constants/certificateTable";
+import { CERTIFICATE_TABLE } from "@/features/certicates/constants/certificateTable";
 
 const CERTIFICATE_COLUMNS = "id,img,created_at";
 
@@ -21,12 +21,14 @@ export const useGetCertificates = () => {
   return useQuery(query.select(CERTIFICATE_COLUMNS));
 };
 
+//TODO: fix type any
+
 export const useCreateCertificate = () => {
   const client = useSupabaseBrowser();
 
   const query = client.from(CERTIFICATE_TABLE);
 
-  return useInsertMutation(query, ["id"], CERTIFICATE_COLUMNS, {
+  return useInsertMutation(query as any, ["id"], CERTIFICATE_COLUMNS, {
     onError: () => {
       toast.error(TOAST_MESSAGES.ERROR);
     },
@@ -41,7 +43,7 @@ export const useUpdateCertificate = () => {
 
   const query = client.from(CERTIFICATE_TABLE);
 
-  return useUpdateMutation(query, ["id"], CERTIFICATE_COLUMNS, {
+  return useUpdateMutation(query as any, ["id"], CERTIFICATE_COLUMNS, {
     onError: () => {
       toast.error(TOAST_MESSAGES.ERROR);
     },
@@ -56,7 +58,7 @@ export const useDeleteCertificate = () => {
 
   const query = client.from(CERTIFICATE_TABLE);
 
-  return useDeleteMutation(query, ["id"], CERTIFICATE_COLUMNS, {
+  return useDeleteMutation(query as any, ["id"], CERTIFICATE_COLUMNS, {
     onSuccess: () => {
       toast.success(TOAST_MESSAGES.DATA_DELETED);
     },

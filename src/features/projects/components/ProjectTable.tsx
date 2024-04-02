@@ -65,6 +65,8 @@ export default function ProjectTable() {
 
   const client = useSupabaseBrowser();
 
+  //TODO: add @supabase-cache-helpers/storage-react-query
+
   const deleteProjectHanlder = async (id: number) => {
     const project = (await deleteProject({ id })) as {
       logo: string;
@@ -124,7 +126,7 @@ export default function ProjectTable() {
     {
       accessorKey: "categories",
       header: "Categoría",
-      cell: ({ row }) => <div>{row.original.categories.name}</div>,
+      cell: ({ row }) => <div>{row.original.categories?.name}</div>,
     },
     {
       accessorKey: "url_link",

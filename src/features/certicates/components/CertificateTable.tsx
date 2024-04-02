@@ -59,6 +59,8 @@ export default function CertificateTable() {
 
   const { mutateAsync: deleteCertificate } = useDeleteCertificate();
 
+  //TODO: add @supabase-cache-helpers/storage-react-query
+
   const deleteCertificateHanlder = async (id: number) => {
     const certificate = await deleteCertificate({ id });
     const fileName =

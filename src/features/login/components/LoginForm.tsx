@@ -12,13 +12,13 @@ import {
 } from "@/components/ui/card";
 
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+
 import supabase from "@/utils/supabase-browser";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import useLoginForm from "../form/useLoginForm";
+import useLoginForm from "@/features/login/form/useLoginForm";
 import {
   Form,
   FormControl,
@@ -38,14 +38,6 @@ export default function Login() {
   const supabaseClient = supabase();
 
   const { push } = useRouter();
-
-  useEffect(() => {
-    supabaseClient.auth.getUser().then((user) => {
-      if (user.data.user) {
-        push("/admin/categories");
-      }
-    });
-  }, [push, supabaseClient.auth]);
 
   const onSubmit = handleSubmit(async (data) => {
     setIsPending(true);
@@ -69,7 +61,7 @@ export default function Login() {
     <div className="w-full h-screen grid place-content-center">
       <Card className="w-[350px]">
         <Form {...formProps}>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={onSubmit}>
             <CardHeader>
               <CardTitle>Login</CardTitle>
               <CardDescription>

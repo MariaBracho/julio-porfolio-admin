@@ -24,10 +24,12 @@ export const useGetCategories = () => {
   return useQuery(getCategories(supabase));
 };
 
+//TODO: fix type any
+
 export const useCreateCategory = () => {
   const client = useSupabaseBrowser();
 
-  return useInsertMutation(createCategory(client), ["id"], "id,name", {
+  return useInsertMutation(createCategory(client) as any, ["id"], "id,name", {
     onError: () => {
       toast.error("El nombre de la categoria debe ser unico");
     },
@@ -40,7 +42,7 @@ export const useCreateCategory = () => {
 export const useUpdateCategory = () => {
   const client = useSupabaseBrowser();
 
-  return useUpdateMutation(createCategory(client), ["id"], "id,name", {
+  return useUpdateMutation(createCategory(client) as any, ["id"], "id,name", {
     onError: () => {
       toast.error("El nombre de la categoria debe ser unico");
     },
@@ -55,7 +57,7 @@ export const useDeleteCategory = () => {
 
   const query = client.from(CATEGORY_TABLE);
 
-  return useDeleteMutation(query, ["id"], "id,name", {
+  return useDeleteMutation(query as any, ["id"], "id,name", {
     onSuccess: () => {
       toast.success(TOAST_MESSAGES.DATA_DELETED);
     },

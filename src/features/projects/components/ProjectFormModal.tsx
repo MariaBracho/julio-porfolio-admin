@@ -82,6 +82,8 @@ export default function ProjectFormModal({
 
   const client = useSupabaseBrowser();
 
+  //TODO: add @supabase-cache-helpers/storage-react-query
+
   const onSubmit: SubmitHandler<ProjectForm> = async (values) => {
     const query = client.storage.from(PROJECT_TABLE);
 

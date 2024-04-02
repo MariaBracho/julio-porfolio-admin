@@ -1,1 +1,1 @@
-export const PROJECT_TABLE = "projects";
+export const PROJECT_TABLE = "projects" as const;
