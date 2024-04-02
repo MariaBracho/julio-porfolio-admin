@@ -2,12 +2,15 @@ import { Input } from "@/components/ui/input";
 
 import type { SubmitHandler } from "react-hook-form";
 
-import { useCreateCategory } from "../../queries/categoriesQueries";
+import {
+  useCreateCategory,
+  useUpdateCategory,
+} from "@/features/categories/queries/categoriesQueries";
 
-import type { Category } from "../../types/category";
+import type { Category } from "@/features/categories/types/category";
 import type { Dispatch, SetStateAction } from "react";
 
-import useCategoryForm from "../../form/useCreateCategoryForm";
+import useCategoryForm from "@/features/categories/form/useCategoryForm";
 
 import FormModal from "@/components/modals/FormModal";
 
@@ -39,13 +42,24 @@ export default function CategoryModal({
   const { handleSubmit } = form;
 
   const { mutateAsync: insert, isPending } = useCreateCategory();
+  const { mutateAsync: update, isPending: isPedingUpdate } =
+    useUpdateCategory();
 
   const onSubmit: SubmitHandler<{ name: string }> = async ({ name }) => {
-    await insert([{ name }], {
-      onSuccess: () => {
-        setOpen(false);
-      },
-    });
+    isEdit && data
+      ? await update(
+          { name, id: data?.id },
+          {
+            onSuccess: () => {
+              setOpen(false);
+            },
+          }
+        )
+      : await insert([{ name }], {
+          onSuccess: () => {
+            setOpen(false);
+          },
+        });
   };
 
   return (
@@ -55,7 +69,7 @@ export default function CategoryModal({
       title={title}
       onOpenChange={setOpen}
       open={open}
-      isLoading={isPending}
+      isLoading={isPending || isPedingUpdate}
     >
       <FormField
         control={form.control}

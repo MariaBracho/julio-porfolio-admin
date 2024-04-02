@@ -25,81 +25,133 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { useCallback, useMemo, useState } from "react";
+import { useState } from "react";
 
-import {
-  useDeleteCategory,
-  useGetCategories,
-} from "@/features/categories/queries/categoriesQueries";
-
-import type { Category } from "@/features/categories/types/category";
+import { Project } from "@/features/projects/types/project";
 
 import Action from "@/components/table/Actions";
+
 import dynamic from "next/dynamic";
+import {
+  useDeletePropject,
+  useGetProjects,
+} from "@/features/projects/queries/projects";
 
-const CategoryModal = dynamic(() => import("../CategoryModal"));
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-export default function CategoryTable() {
+import Image from "next/image";
+
+import useSupabaseBrowser from "@/utils/supabase-browser";
+
+import { PROJECT_TABLE } from "@/features/projects/constants/projectTable";
+import { Link1Icon } from "@radix-ui/react-icons";
+
+const ProjectFormModal = dynamic(() => import("./ProjectFormModal"));
+
+export default function ProjectTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
 
-  const { data, isLoading } = useGetCategories();
+  const { data, isLoading } = useGetProjects();
 
   const [isOpenModal, setIsOpenModal] = useState(false);
-  const [isEditCategory, setIsEditCategory] = useState(false);
+  const [isEditProject, setIsEditProject] = useState(false);
 
-  const [categoryRow, setCategoryRow] = useState<null | Category>(null);
+  const [projectRow, setProjectRow] = useState<null | Project>(null);
 
-  const { mutateAsync: deleteCategory } = useDeleteCategory();
+  const { mutateAsync: deleteProject } = useDeletePropject();
 
-  const deleteCategoryHanlder = useCallback(
-    async (id: number) => {
-      await deleteCategory({ id });
-    },
-    [deleteCategory]
-  );
+  const client = useSupabaseBrowser();
 
-  const openEditCategoryModal = (category: Category) => {
-    setIsEditCategory(true);
-    setIsOpenModal(true);
-    setCategoryRow(category);
+  const deleteProjectHanlder = async (id: number) => {
+    const project = (await deleteProject({ id })) as {
+      logo: string;
+      img: string;
+    };
+
+    if (project) {
+      const fileNameImg = project.img.split("/").at(-1) as string;
+      const fileNameLogo = project.logo.split("/").at(-1) as string;
+
+      await client.storage
+        .from(PROJECT_TABLE)
+        .remove([fileNameImg, fileNameLogo]);
+    }
   };
 
-  const columns: ColumnDef<Category>[] = useMemo(
-    () => [
-      {
-        header: "ID",
-        accessorKey: "id",
-        accessor: "id",
-        cell: ({ row }) => <p>{row.getValue("id")}</p>,
+  const openEditProjectModal = (category: Project) => {
+    setIsEditProject(true);
+    setIsOpenModal(true);
+    setProjectRow(category);
+  };
+
+  const columns: ColumnDef<Project>[] = [
+    {
+      header: "ID",
+      accessorKey: "id",
+      cell: ({ row }) => <p>{row.getValue("id")}</p>,
+    },
+    {
+      accessorKey: "img",
+      header: "Foto del proyecto",
+      cell: ({ row }) => (
+        <Image
+          src={row.getValue("img")}
+          alt="img"
+          width={224}
+          height={224}
+          className="h-auto w-auto"
+        />
+      ),
+    },
+    {
+      accessorKey: "title",
+      header: "Titulo",
+      cell: ({ row }) => <div>{row.getValue("title")}</div>,
+    },
+    {
+      accessorKey: "logo",
+      header: "Logo",
+      cell: ({ row }) => (
+        <Avatar>
+          <AvatarImage src={row.getValue("logo")} />
+          <AvatarFallback>logo</AvatarFallback>
+        </Avatar>
+      ),
+    },
+    {
+      accessorKey: "categories",
+      header: "Categoría",
+      cell: ({ row }) => <div>{row.original.categories.name}</div>,
+    },
+    {
+      accessorKey: "url_link",
+      header: "URL",
+      cell: ({ row }) => (
+        <a target="_blank" rel="noopener" href={row.getValue("url_link")}>
+          <div className="flex gap-2 items-center text-sky-500 ">
+            <Link1Icon />
+            <p> Link</p>
+          </div>
+        </a>
+      ),
+    },
+    {
+      id: "actions",
+      enableHiding: false,
+      cell: ({ row }) => {
+        return (
+          <Action
+            editCallback={() => openEditProjectModal(row.original)}
+            deleteCallback={() => deleteProjectHanlder(row.original.id)}
+            row={row.original}
+          />
+        );
       },
-      {
-        accessorKey: "name",
-        header: "Categoria",
-        accessor: "name",
-        cell: ({ row }) => (
-          <div className="capitalize">{row.getValue("name")}</div>
-        ),
-      },
-      {
-        id: "actions",
-        enableHiding: false,
-        accessor: "action",
-        cell: ({ row }) => {
-          return (
-            <Action
-              editCallback={() => openEditCategoryModal(row.original)}
-              deleteCallback={() => deleteCategoryHanlder(row.original.id)}
-              row={row.original}
-            />
-          );
-        },
-      },
-    ],
-    [deleteCategoryHanlder]
-  );
+    },
+  ];
 
   const table = useReactTable({
     data: data ?? [],
@@ -122,17 +174,17 @@ export default function CategoryTable() {
 
   const openCreateCategoryModal = () => {
     setIsOpenModal(true);
-    setIsEditCategory(false);
+    setIsEditProject(false);
   };
 
   return (
     <div className="w-full">
       {isOpenModal && (
-        <CategoryModal
-          data={categoryRow}
+        <ProjectFormModal
+          data={projectRow}
           open={isOpenModal}
           setOpen={setIsOpenModal}
-          isEdit={isEditCategory}
+          isEdit={isEditProject}
         />
       )}
       <div className="w-full">
@@ -142,16 +194,16 @@ export default function CategoryTable() {
           <div className="w-full">
             <div className="flex items-center  justify-between py-4">
               <Input
-                placeholder="Filter categories..."
+                placeholder="Filtrar proyectos..."
                 value={
-                  (table.getColumn("name")?.getFilterValue() as string) ?? ""
+                  (table.getColumn("title")?.getFilterValue() as string) ?? ""
                 }
                 onChange={(event) =>
-                  table.getColumn("name")?.setFilterValue(event.target.value)
+                  table.getColumn("title")?.setFilterValue(event.target.value)
                 }
                 className="max-w-sm"
               />
-              <Button onClick={openCreateCategoryModal}>Crear categoría</Button>
+              <Button onClick={openCreateCategoryModal}>Crear Proyecto</Button>
             </div>
             <div className="rounded-md border">
               <Table>

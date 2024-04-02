@@ -13,55 +13,70 @@ export type Database = {
         Row: {
           created_at: string
           id: number
-          name: string | null
+          name: string
         }
         Insert: {
           created_at?: string
           id?: number
-          name?: string | null
+          name: string
         }
         Update: {
           created_at?: string
           id?: number
-          name?: string | null
+          name?: string
+        }
+        Relationships: []
+      }
+      certificate: {
+        Row: {
+          created_at: string
+          id: number
+          img: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          img: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          img?: string
         }
         Relationships: []
       }
       projects: {
         Row: {
-          category: number | null
+          category_id: number | null
           created_at: string
           id: number
-          img: string | null
-          logo: string | null
-          sub_title: string | null
+          img: string
+          logo: string
           title: string | null
           url_link: string
         }
         Insert: {
-          category?: number | null
+          category_id?: number | null
           created_at?: string
           id?: number
-          img?: string | null
-          logo?: string | null
-          sub_title?: string | null
+          img: string
+          logo: string
           title?: string | null
           url_link: string
         }
         Update: {
-          category?: number | null
+          category_id?: number | null
           created_at?: string
           id?: number
-          img?: string | null
-          logo?: string | null
-          sub_title?: string | null
+          img?: string
+          logo?: string
           title?: string | null
           url_link?: string
         }
         Relationships: [
           {
             foreignKeyName: "public_projects_category_fkey"
-            columns: ["category"]
+            columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
             referencedColumns: ["id"]

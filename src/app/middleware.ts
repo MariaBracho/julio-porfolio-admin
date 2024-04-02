@@ -56,14 +56,11 @@ export async function middleware(request: NextRequest) {
 
   await supabase.auth.getUser().then((user) => {
     if (!user.data.user && request.nextUrl.pathname !== "/login") {
-      console.log("User not found, redirecting to /login");
       response = NextResponse.redirect(
         new URL("/login", request.nextUrl.origin)
       );
     }
   });
-
-  console.log("Middleware response", response);
 
   return response;
 }

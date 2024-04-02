@@ -1,3 +1,3 @@
 import type { Tables } from "@/types/supabase";
 
-export type Category = Tables<"categories">;
+export type Certificate = Tables<"certificate">;

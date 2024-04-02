@@ -1,5 +1,10 @@
 "use client";
 
+import { useState } from "react";
+
+import dynamic from "next/dynamic";
+import Image from "next/image";
+
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -15,7 +20,6 @@ import {
 
 import { Button } from "@/components/ui/button";
 
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -25,81 +29,83 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { useCallback, useMemo, useState } from "react";
-
-import {
-  useDeleteCategory,
-  useGetCategories,
-} from "@/features/categories/queries/categoriesQueries";
-
-import type { Category } from "@/features/categories/types/category";
+import type { Certificate } from "@/features/certicates/types/certificate";
 
 import Action from "@/components/table/Actions";
-import dynamic from "next/dynamic";
 
-const CategoryModal = dynamic(() => import("../CategoryModal"));
+import {
+  useDeleteCertificate,
+  useGetCertificates,
+} from "@/features/certicates/queries/certificatesQueries";
 
-export default function CategoryTable() {
+import useSupabaseBrowser from "@/utils/supabase-browser";
+
+const CertificateFormModal = dynamic(() => import("./CertificateFormModal"));
+
+export default function CertificateTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
 
-  const { data, isLoading } = useGetCategories();
+  const client = useSupabaseBrowser();
+
+  const { data, isLoading } = useGetCertificates();
 
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isEditCategory, setIsEditCategory] = useState(false);
 
-  const [categoryRow, setCategoryRow] = useState<null | Category>(null);
+  const [categoryRow, setCategoryRow] = useState<null | Certificate>(null);
 
-  const { mutateAsync: deleteCategory } = useDeleteCategory();
+  const { mutateAsync: deleteCertificate } = useDeleteCertificate();
 
-  const deleteCategoryHanlder = useCallback(
-    async (id: number) => {
-      await deleteCategory({ id });
-    },
-    [deleteCategory]
-  );
+  const deleteCertificateHanlder = async (id: number) => {
+    const certificate = await deleteCertificate({ id });
+    const fileName =
+      certificate?.img && (certificate?.img as string).split("/").at(-1);
 
-  const openEditCategoryModal = (category: Category) => {
+    await client.storage.from("certificate").remove([`${fileName}`]);
+  };
+
+  const openEditCategoryModal = (category: Certificate) => {
     setIsEditCategory(true);
     setIsOpenModal(true);
     setCategoryRow(category);
   };
 
-  const columns: ColumnDef<Category>[] = useMemo(
-    () => [
-      {
-        header: "ID",
-        accessorKey: "id",
-        accessor: "id",
-        cell: ({ row }) => <p>{row.getValue("id")}</p>,
+  const columns: ColumnDef<Certificate>[] = [
+    {
+      header: "ID",
+      accessorKey: "id",
+      cell: ({ row }) => <p>{row.getValue("id")}</p>,
+    },
+    {
+      accessorKey: "img",
+      header: "Certificado",
+      cell: ({ row }) => (
+        <Image
+          src={row.getValue("img")}
+          alt="img"
+          width={200}
+          height={200}
+          className="w-auto h-auto"
+        />
+      ),
+    },
+    {
+      id: "actions",
+      enableHiding: false,
+      cell: ({ row }) => {
+        return (
+          <Action
+            editCallback={() => openEditCategoryModal(row.original)}
+            deleteCallback={() => deleteCertificateHanlder(row.original.id)}
+            row={row.original}
+          />
+        );
       },
-      {
-        accessorKey: "name",
-        header: "Categoria",
-        accessor: "name",
-        cell: ({ row }) => (
-          <div className="capitalize">{row.getValue("name")}</div>
-        ),
-      },
-      {
-        id: "actions",
-        enableHiding: false,
-        accessor: "action",
-        cell: ({ row }) => {
-          return (
-            <Action
-              editCallback={() => openEditCategoryModal(row.original)}
-              deleteCallback={() => deleteCategoryHanlder(row.original.id)}
-              row={row.original}
-            />
-          );
-        },
-      },
-    ],
-    [deleteCategoryHanlder]
-  );
+    },
+  ];
 
   const table = useReactTable({
     data: data ?? [],
@@ -128,7 +134,7 @@ export default function CategoryTable() {
   return (
     <div className="w-full">
       {isOpenModal && (
-        <CategoryModal
+        <CertificateFormModal
           data={categoryRow}
           open={isOpenModal}
           setOpen={setIsOpenModal}
@@ -140,18 +146,10 @@ export default function CategoryTable() {
           <p>Loading...</p>
         ) : (
           <div className="w-full">
-            <div className="flex items-center  justify-between py-4">
-              <Input
-                placeholder="Filter categories..."
-                value={
-                  (table.getColumn("name")?.getFilterValue() as string) ?? ""
-                }
-                onChange={(event) =>
-                  table.getColumn("name")?.setFilterValue(event.target.value)
-                }
-                className="max-w-sm"
-              />
-              <Button onClick={openCreateCategoryModal}>Crear categoría</Button>
+            <div className="flex items-center  justify-end py-4">
+              <Button onClick={openCreateCategoryModal}>
+                Crear certificado
+              </Button>
             </div>
             <div className="rounded-md border">
               <Table>
