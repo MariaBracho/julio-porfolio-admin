@@ -1,6 +1,6 @@
 export const NAVBAR_ROUTER = [
   {
-    label: "Categoria",
+    label: "Categorías",
     path: "/admin/categories",
   },
   {
@@ -8,7 +8,7 @@ export const NAVBAR_ROUTER = [
     path: "/admin/projects",
   },
   {
-    label: "Proyectos",
+    label: "Certificados",
     path: "/admin/certificates",
   },
 ];

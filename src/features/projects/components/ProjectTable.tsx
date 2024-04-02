@@ -104,7 +104,7 @@ export default function ProjectTable() {
           alt="img"
           width={224}
           height={224}
-          className="h-auto w-auto"
+          className="h-52 w-52 object-cover"
         />
       ),
     },

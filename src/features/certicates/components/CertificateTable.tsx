@@ -90,7 +90,7 @@ export default function CertificateTable() {
           alt="img"
           width={200}
           height={200}
-          className="w-auto h-auto"
+          className="h-52 w-52 object-cover"
         />
       ),
     },
