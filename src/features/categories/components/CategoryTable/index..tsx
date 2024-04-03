@@ -25,7 +25,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { useCallback, useMemo, useState } from "react";
+import { useState } from "react";
 
 import {
   useDeleteCategory,
@@ -36,6 +36,10 @@ import type { Category } from "@/features/categories/types/category";
 
 import Action from "@/components/table/Actions";
 import dynamic from "next/dynamic";
+import Image from "next/image";
+import useSupabaseBrowser from "@/utils/supabase-browser";
+import { toast } from "sonner";
+import { TOAST_MESSAGES } from "@/constants/toastMessage";
 
 const CategoryModal = dynamic(() => import("../CategoryModal"));
 
@@ -52,14 +56,29 @@ export default function CategoryTable() {
 
   const [categoryRow, setCategoryRow] = useState<null | Category>(null);
 
+  const client = useSupabaseBrowser();
+  const query = client.storage.from("category");
+
   const { mutateAsync: deleteCategory } = useDeleteCategory();
 
-  const deleteCategoryHanlder = useCallback(
-    async (id: number) => {
-      await deleteCategory({ id });
-    },
-    [deleteCategory]
-  );
+  const deleteCategoryHanlder = async (id: number, icon: string | null) => {
+    await deleteCategory(
+      { id },
+      {
+        onSuccess: async () => {
+          if (icon) {
+            const fileName = icon.split("/").at(-1);
+            await query.remove([`${fileName}`]);
+          }
+        },
+        onError: (error) => {
+          if (error.code === "23503") {
+            toast.error(TOAST_MESSAGES.NOT_REFERENCE_DATA);
+          }
+        },
+      }
+    );
+  };
 
   const openEditCategoryModal = (category: Category) => {
     setIsEditCategory(true);
@@ -67,39 +86,48 @@ export default function CategoryTable() {
     setCategoryRow(category);
   };
 
-  const columns: ColumnDef<Category>[] = useMemo(
-    () => [
-      {
-        header: "ID",
-        accessorKey: "id",
-        accessor: "id",
-        cell: ({ row }) => <p>{row.getValue("id")}</p>,
+  const columns: ColumnDef<Category>[] = [
+    {
+      header: "ID",
+      accessorKey: "id",
+      cell: ({ row }) => <p>{row.getValue("id")}</p>,
+    },
+    {
+      accessorKey: "name",
+      header: "Categoria",
+      cell: ({ row }) => (
+        <div className="capitalize">{row.getValue("name")}</div>
+      ),
+    },
+    {
+      accessorKey: "icon",
+      header: "Icono",
+      cell: ({ row }) => (
+        <Image
+          src={row.getValue("icon") ?? ""}
+          alt="icon"
+          width={24}
+          height={24}
+          className="object-cover h-6 w-6"
+        />
+      ),
+    },
+    {
+      id: "actions",
+      enableHiding: false,
+      cell: ({ row }) => {
+        return (
+          <Action
+            editCallback={() => openEditCategoryModal(row.original)}
+            deleteCallback={() =>
+              deleteCategoryHanlder(row.original.id, row.original?.icon)
+            }
+            row={row.original}
+          />
+        );
       },
-      {
-        accessorKey: "name",
-        header: "Categoria",
-        accessor: "name",
-        cell: ({ row }) => (
-          <div className="capitalize">{row.getValue("name")}</div>
-        ),
-      },
-      {
-        id: "actions",
-        enableHiding: false,
-        accessor: "action",
-        cell: ({ row }) => {
-          return (
-            <Action
-              editCallback={() => openEditCategoryModal(row.original)}
-              deleteCallback={() => deleteCategoryHanlder(row.original.id)}
-              row={row.original}
-            />
-          );
-        },
-      },
-    ],
-    [deleteCategoryHanlder]
-  );
+    },
+  ];
 
   const table = useReactTable({
     data: data ?? [],

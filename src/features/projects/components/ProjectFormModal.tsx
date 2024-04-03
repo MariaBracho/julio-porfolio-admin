@@ -55,6 +55,9 @@ export default function ProjectFormModal({
   open = false,
   setOpen,
 }: Props) {
+  const client = useSupabaseBrowser();
+  const query = client.storage.from(PROJECT_TABLE);
+
   const title = isEdit ? "Editar proyecto" : "Crear proyecto";
 
   const form = useProjectForm(data);
@@ -76,32 +79,43 @@ export default function ProjectFormModal({
     setLogo(getFile(event));
   };
 
-  const updatedModal = () => {
+  interface updatedProjectFile {
+    publicUrlImg?: string | null;
+    publicUrlLogo?: string | null;
+  }
+
+  const updatedModal = async ({
+    publicUrlImg,
+    publicUrlLogo,
+  }: updatedProjectFile) => {
     setOpen(false);
+
+    const fileNameImg = data?.img.split("/").at(-1);
+    const fileNameLogo = data?.logo.split("/").at(-1);
+
+    publicUrlImg && (await query.remove([`${fileNameImg}`]));
+    publicUrlLogo && (await query.remove([`${fileNameLogo}`]));
   };
 
-  const client = useSupabaseBrowser();
-
-  //TODO: add @supabase-cache-helpers/storage-react-query
-
   const onSubmit: SubmitHandler<ProjectForm> = async (values) => {
-    const query = client.storage.from(PROJECT_TABLE);
-
     let filePathImg = null;
     let filePathLogo = null;
 
-    let publicUrlImg = null;
-    let publicUrlLogo = null;
+    let publicUrlImg: string | null = null;
+    let publicUrlLogo: string | null = null;
 
-    if (img && logo) {
-      const fileNameImg = formatFileName(img);
-      const fileNameLogo = formatFileName(logo);
+    if (img) {
+      const fileNameImg = formatFileName(img.name);
 
       const { data: imgData } = await query.upload(fileNameImg, img, {
         cacheControl: "3600",
       });
 
       filePathImg = imgData;
+    }
+
+    if (logo) {
+      const fileNameLogo = formatFileName(logo.name);
 
       const { data: logoData } = await query.upload(fileNameLogo, logo, {
         cacheControl: "3600",
@@ -124,6 +138,7 @@ export default function ProjectFormModal({
       } = query.getPublicUrl(filePathLogo.path);
 
       publicUrlLogo = publicUrl;
+      console.log({ publicUrl });
     }
 
     if (isEdit && data) {
@@ -136,7 +151,7 @@ export default function ProjectFormModal({
           id: data.id,
         }),
         {
-          onSuccess: updatedModal,
+          onSuccess: () => updatedModal({ publicUrlImg, publicUrlLogo }),
         }
       );
     } else {
@@ -150,7 +165,7 @@ export default function ProjectFormModal({
           },
         ],
         {
-          onSuccess: updatedModal,
+          onSuccess: () => updatedModal({}),
         }
       );
     }

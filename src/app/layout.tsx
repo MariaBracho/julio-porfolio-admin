@@ -17,13 +17,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <ReactQueryClientProvider>
+    <ReactQueryClientProvider>
+      <html lang="en">
         <body className={inter.className}>
           <Toaster />
           {children}
         </body>
-      </ReactQueryClientProvider>
-    </html>
+      </html>
+    </ReactQueryClientProvider>
   );
 }

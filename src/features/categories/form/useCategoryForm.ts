@@ -2,16 +2,19 @@ import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { type CategoryForm, categorySchema } from "./categorySchema";
+import type { Category } from "@/features/categories/types/category";
 
-import type { Category } from "../types/category";
+import { type CategoryForm, categorySchema, editCategorySchema } from "./categorySchema";
 
 export default function useCategoryForm(category?: Category | null) {
+  const schema= category? editCategorySchema: categorySchema
+
   return useForm<CategoryForm>({
-    resolver: zodResolver(categorySchema),
+    resolver: zodResolver(schema),
     mode: "onChange",
     defaultValues: {
       name: category?.name ?? "",
+      icon: ''
     },
   });
 }

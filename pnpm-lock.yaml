@@ -38,6 +38,9 @@ dependencies:
   '@supabase-cache-helpers/postgrest-react-query':
     specifier: ^1.6.2
     version: 1.6.2(@supabase/postgrest-js@1.9.0)(@supabase/supabase-js@2.40.0)(@tanstack/react-query@5.28.9)(react@18.2.0)
+  '@supabase-cache-helpers/storage-react-query':
+    specifier: ^1.2.1
+    version: 1.2.1(@supabase/storage-js@2.5.5)(@tanstack/react-query@5.28.9)(react@18.2.0)
   '@supabase/auth-helpers-nextjs':
     specifier: ^0.7.1
     version: 0.7.4(@supabase/supabase-js@2.40.0)
@@ -47,6 +50,9 @@ dependencies:
   '@supabase/ssr':
     specifier: ^0.1.0
     version: 0.1.0(@supabase/supabase-js@2.40.0)
+  '@supabase/storage-js':
+    specifier: ^2.5.5
+    version: 2.5.5
   '@supabase/supabase-js':
     specifier: ^2.26.0
     version: 2.40.0
@@ -1131,6 +1137,23 @@ packages:
       react: 18.2.0
     transitivePeerDependencies:
       - '@supabase/supabase-js'
+    dev: false
+
+  /@supabase-cache-helpers/storage-core@0.0.4:
+    resolution: {integrity: sha512-QYSVKK200vbPC3UToHBLSN1jvU0Be7TA0tJVdRUOegSBa42XzL3+llR9O/ynIMr70gSilI7LgHstYU7SmOje6Q==}
+    dev: false
+
+  /@supabase-cache-helpers/storage-react-query@1.2.1(@supabase/storage-js@2.5.5)(@tanstack/react-query@5.28.9)(react@18.2.0):
+    resolution: {integrity: sha512-Elo1Fd+b5RtfOgv7KpW++4XnKhZARkI7QfO1+x/pxQvzXsPNHqQGs/mrzOZcHXbFNEgBz6Pw22xscKMVkUHMPw==}
+    peerDependencies:
+      '@supabase/storage-js': ^2.4.0
+      '@tanstack/react-query': ^4.0.0 || ^5.0.0
+      react: ^16.11.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      '@supabase-cache-helpers/storage-core': 0.0.4
+      '@supabase/storage-js': 2.5.5
+      '@tanstack/react-query': 5.28.9(react@18.2.0)
+      react: 18.2.0
     dev: false
 
   /@supabase/auth-helpers-nextjs@0.7.4(@supabase/supabase-js@2.40.0):

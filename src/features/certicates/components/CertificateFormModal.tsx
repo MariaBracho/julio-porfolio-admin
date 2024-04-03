@@ -64,14 +64,12 @@ export default function CertificateFormModal({
 
   const client = useSupabaseBrowser();
 
-  //TODO: add @supabase-cache-helpers/storage-react-query
-
   const onSubmit: SubmitHandler<CertificateForm> = async () => {
     const query = client.storage.from(CERTIFICATE_TABLE);
 
     if (!file) return;
 
-    const fileName = formatFileName(file);
+    const fileName = formatFileName(file.name);
 
     const { data: imgData } = await query.upload(fileName, file, {
       cacheControl: "3600",
@@ -84,15 +82,16 @@ export default function CertificateFormModal({
 
       if (isEdit && data) {
         const lastFile = data.img.split("/").at(-1);
-        await query.remove([`${lastFile}`]);
+
         await update(
           {
             id: data.id,
             img: publicUrl,
           },
           {
-            onSuccess: () => {
+            onSuccess: async () => {
               setOpen(false);
+              await query.remove([`${lastFile}`]);
             },
           }
         );
