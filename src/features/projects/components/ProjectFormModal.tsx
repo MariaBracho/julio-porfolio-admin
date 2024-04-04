@@ -138,7 +138,6 @@ export default function ProjectFormModal({
       } = query.getPublicUrl(filePathLogo.path);
 
       publicUrlLogo = publicUrl;
-      console.log({ publicUrl });
     }
 
     if (isEdit && data) {

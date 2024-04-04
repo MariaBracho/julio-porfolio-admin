@@ -1,7 +1,5 @@
 import { useState, type Dispatch, type SetStateAction } from "react";
 
-import { useUpload } from "@supabase-cache-helpers/storage-react-query";
-
 import { Input } from "@/components/ui/input";
 
 import type { SubmitHandler } from "react-hook-form";
@@ -24,11 +22,15 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import useSupabaseBrowser from "@/utils/supabase-browser";
+
 import { getThrutyValues } from "@/utils/getThrutyValues";
 
 import type { CategoryForm } from "@/features/categories/form/categorySchema";
-import { formatFileName } from "@/utils/formatFileName";
+
+import useCategoryStorage from "@/features/categories/hooks/useCategoryStorage";
+import { toast } from "sonner";
+import { TOAST_MESSAGES } from "@/constants/toastMessage";
+import { ACCEPT_FILE_TYPES } from "@/constants/acceptFileTypes";
 
 interface Props {
   isEdit: boolean;
@@ -45,14 +47,6 @@ export default function CategoryModal({
 }: Props) {
   const [icon, setIcon] = useState<File>();
 
-  const client = useSupabaseBrowser();
-
-  const query = client.storage.from("category");
-
-  const { mutateAsync: upload } = useUpload(query, {
-    buildFileName: ({ fileName }) => formatFileName(fileName),
-  });
-
   const title = isEdit ? "Editar categoria" : "Crear categoria";
 
   const form = useCategoryForm(data);
@@ -63,40 +57,33 @@ export default function CategoryModal({
   const { mutateAsync: update, isPending: isPedingUpdate } =
     useUpdateCategory();
 
+  const { updatedIcon, uploadIcon } = useCategoryStorage();
+
   const onSubmit: SubmitHandler<CategoryForm> = async ({ name }) => {
-    let publlicUrlIcon: string | null = null;
-
-    if (icon) {
-      const [iconPath] = await upload({
-        files: [icon],
-      });
-
-      if (iconPath.data?.path) {
-        const {
-          data: { publicUrl },
-        } = query.getPublicUrl(iconPath.data.path);
-
-        publlicUrlIcon = publicUrl;
-      }
-    }
-
-    if (isEdit && data?.icon) {
-      const fileName = data.icon.split("/").at(-1);
-
-      await update(
-        getThrutyValues({ name, id: data?.id, icon: publlicUrlIcon }),
-        {
-          onSuccess: async () => {
+    if (isEdit && data) {
+      await update(getThrutyValues({ name, id: data.id }), {
+        onSuccess: async () => {
+          if (icon) {
+            const url = await updatedIcon({
+              lastIcon: data.icon,
+              newIcon: icon,
+            });
+            await update({ icon: url, id: data.id });
+            toast.success(TOAST_MESSAGES.DATA_SAVED);
             setOpen(false);
-            publlicUrlIcon && (await query.remove([`${fileName}`]));
-          },
-        }
-      );
-    } else {
-      await insert([{ name, icon: publlicUrlIcon }], {
-        onSuccess: () => setOpen(false),
+            return;
+          }
+          setOpen(false);
+          toast.success(TOAST_MESSAGES.DATA_SAVED);
+        },
       });
+      return;
     }
+
+    const url = await uploadIcon(icon);
+    await insert([{ name, icon: url }], {
+      onSuccess: () => setOpen(false),
+    });
   };
 
   return (
@@ -129,6 +116,7 @@ export default function CategoryModal({
             <FormLabel>Icono</FormLabel>
             <FormControl>
               <Input
+                accept={ACCEPT_FILE_TYPES}
                 type="file"
                 className="w-full"
                 {...field}

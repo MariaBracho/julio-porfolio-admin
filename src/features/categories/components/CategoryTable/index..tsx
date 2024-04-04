@@ -37,11 +37,10 @@ import type { Category } from "@/features/categories/types/category";
 import Action from "@/components/table/Actions";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import useSupabaseBrowser from "@/utils/supabase-browser";
-import { toast } from "sonner";
-import { TOAST_MESSAGES } from "@/constants/toastMessage";
 
-const CategoryModal = dynamic(() => import("../CategoryModal"));
+const CategoryModal = dynamic(
+  () => import("@/features/categories/components/CategoryModal")
+);
 
 export default function CategoryTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -56,28 +55,10 @@ export default function CategoryTable() {
 
   const [categoryRow, setCategoryRow] = useState<null | Category>(null);
 
-  const client = useSupabaseBrowser();
-  const query = client.storage.from("category");
-
   const { mutateAsync: deleteCategory } = useDeleteCategory();
 
-  const deleteCategoryHanlder = async (id: number, icon: string | null) => {
-    await deleteCategory(
-      { id },
-      {
-        onSuccess: async () => {
-          if (icon) {
-            const fileName = icon.split("/").at(-1);
-            await query.remove([`${fileName}`]);
-          }
-        },
-        onError: (error) => {
-          if (error.code === "23503") {
-            toast.error(TOAST_MESSAGES.NOT_REFERENCE_DATA);
-          }
-        },
-      }
-    );
+  const deleteCategoryHanlder = async (id: number) => {
+    await deleteCategory({ id });
   };
 
   const openEditCategoryModal = (category: Category) => {
@@ -119,9 +100,7 @@ export default function CategoryTable() {
         return (
           <Action
             editCallback={() => openEditCategoryModal(row.original)}
-            deleteCallback={() =>
-              deleteCategoryHanlder(row.original.id, row.original?.icon)
-            }
+            deleteCallback={() => deleteCategoryHanlder(row.original.id)}
             row={row.original}
           />
         );

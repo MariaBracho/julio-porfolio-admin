@@ -1,0 +1,1 @@
+export const ACCEPT_FILE_TYPES = "image/png, image/jpeg, image/jpg, image/webp, .svg";    
