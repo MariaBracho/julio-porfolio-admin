@@ -6,17 +6,23 @@ import {
   useQuery,
   useUpdateMutation,
 } from "@supabase-cache-helpers/postgrest-react-query";
+
 import useSupabaseBrowser from "@/utils/supabase-browser";
 
 import { TOAST_MESSAGES } from "@/constants/toastMessage";
-import { CERTIFICATE_TABLE } from "@/features/certicates/constants/certificateTable";
+
+import useCertificatesStorage from "@/features/certicates/hooks/useCertificatesStorage";
+
+import { TABLE_KEYS } from "@/constants/tableKeys";
 
 const CERTIFICATE_COLUMNS = "id,img,created_at";
+
+const { CATEGORIES } = TABLE_KEYS;
 
 export const useGetCertificates = () => {
   const supabase = useSupabaseBrowser();
 
-  const query = supabase.from(CERTIFICATE_TABLE);
+  const query = supabase.from(CATEGORIES);
 
   return useQuery(query.select(CERTIFICATE_COLUMNS));
 };
@@ -26,7 +32,7 @@ export const useGetCertificates = () => {
 export const useCreateCertificate = () => {
   const client = useSupabaseBrowser();
 
-  const query = client.from(CERTIFICATE_TABLE);
+  const query = client.from(CATEGORIES);
 
   return useInsertMutation(query as any, ["id"], CERTIFICATE_COLUMNS, {
     onError: () => {
@@ -41,7 +47,7 @@ export const useCreateCertificate = () => {
 export const useUpdateCertificate = () => {
   const client = useSupabaseBrowser();
 
-  const query = client.from(CERTIFICATE_TABLE);
+  const query = client.from(CATEGORIES);
 
   return useUpdateMutation(query as any, ["id"], CERTIFICATE_COLUMNS, {
     onError: () => {
@@ -56,11 +62,16 @@ export const useUpdateCertificate = () => {
 export const useDeleteCertificate = () => {
   const client = useSupabaseBrowser();
 
-  const query = client.from(CERTIFICATE_TABLE);
+  const { removeCertificate } = useCertificatesStorage();
+
+  const query = client.from(CATEGORIES);
 
   return useDeleteMutation(query as any, ["id"], CERTIFICATE_COLUMNS, {
-    onSuccess: () => {
+    onSuccess: async (data) => {
       toast.success(TOAST_MESSAGES.DATA_DELETED);
+      if (data?.img && typeof data.img === "string") {
+        await removeCertificate(data.img);
+      }
     },
   });
 };

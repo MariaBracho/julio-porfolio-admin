@@ -16,6 +16,11 @@ export default function useCategoryStorage() {
     buildFileName: ({ fileName }) => formatFileName(fileName),
   });
 
+  const deleteIcon = async (icon: string | null) => {
+    if (!icon) return;
+    return await query.remove([`${getFileNameFromUrl(icon)}`]);
+  };
+
   const updatedIcon = async ({
     lastIcon,
     newIcon,
@@ -23,16 +28,13 @@ export default function useCategoryStorage() {
     lastIcon: string | null;
     newIcon: File;
   }) => {
-    const [ file ]= await upload(
+    const [file] = await upload(
       {
         files: [newIcon],
       },
       {
         onSuccess: async () => {
-          if (lastIcon) {
-            const fileName = getFileNameFromUrl(lastIcon);
-            await query.remove([`${fileName}`]);
-          }
+            await deleteIcon(lastIcon);
         },
       }
     );
@@ -43,19 +45,12 @@ export default function useCategoryStorage() {
   const uploadIcon = async (icon: File | undefined) => {
     if (!icon) return;
 
-     const [file]=await upload(
-      {
-        files: [icon],
-      }
-    );
+    const [file] = await upload({
+      files: [icon],
+    });
 
     return getPublicUrlFromFile(file, query);
   };
-
-  const deleteIcon = async (icon: string) => {
-    return await query.remove([`${getFileNameFromUrl(icon)}`]);
-  };
-
 
   return { uploadIcon, updatedIcon, deleteIcon };
 }

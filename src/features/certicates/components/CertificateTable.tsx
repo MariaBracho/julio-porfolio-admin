@@ -38,8 +38,6 @@ import {
   useGetCertificates,
 } from "@/features/certicates/queries/certificatesQueries";
 
-import useSupabaseBrowser from "@/utils/supabase-browser";
-
 const CertificateFormModal = dynamic(() => import("./CertificateFormModal"));
 
 export default function CertificateTable() {
@@ -47,8 +45,6 @@ export default function CertificateTable() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-
-  const client = useSupabaseBrowser();
 
   const { data, isLoading } = useGetCertificates();
 
@@ -59,14 +55,8 @@ export default function CertificateTable() {
 
   const { mutateAsync: deleteCertificate } = useDeleteCertificate();
 
-  //TODO: add @supabase-cache-helpers/storage-react-query
-
   const deleteCertificateHanlder = async (id: number) => {
-    const certificate = await deleteCertificate({ id });
-    const fileName =
-      certificate?.img && (certificate?.img as string).split("/").at(-1);
-
-    await client.storage.from("certificate").remove([`${fileName}`]);
+    await deleteCertificate({ id });
   };
 
   const openEditCategoryModal = (category: Certificate) => {
@@ -75,15 +65,15 @@ export default function CertificateTable() {
     setCategoryRow(category);
   };
 
-  const columns: ColumnDef<Certificate>[] = [
+  const columns: ColumnDef<Certificate | any>[] = [
     {
       header: "ID",
       accessorKey: "id",
       cell: ({ row }) => <p>{row.getValue("id")}</p>,
     },
     {
-      accessorKey: "img",
       header: "Certificado",
+      accessorKey: "img",
       cell: ({ row }) => (
         <Image
           src={row.getValue("img")}
