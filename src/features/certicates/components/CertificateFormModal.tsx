@@ -46,7 +46,7 @@ export default function CertificateFormModal({
   open = false,
   setOpen,
 }: Props) {
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<FileList | null>(null);
 
   const title = isEdit ? "Editar certificado" : "Crear certificado";
 
@@ -60,18 +60,18 @@ export default function CertificateFormModal({
     useUpdateCertificate();
 
   const onUpdateImg = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFile(getFile(event));
+    setFiles(event.target.files);
   };
 
   const { uploadCertificate, updatedCertificate } = useCertificatesStorage();
 
   const onSubmit: SubmitHandler<CertificateForm> = async () => {
-    if (!file) return;
+    if (!files) return;
 
     if (isEdit && data) {
       const publicUrl = await updatedCertificate({
         lastFile: data.img,
-        newFile: file,
+        newFile: files[0],
       });
 
       await update(
@@ -89,9 +89,9 @@ export default function CertificateFormModal({
       return;
     }
 
-    const publicUrl = await uploadCertificate(file);
+    const publicUrls = await uploadCertificate(files);
 
-    await insert([{ img: publicUrl }], {
+    await insert(publicUrls, {
       onSuccess: () => {
         setOpen(false);
       },
@@ -116,6 +116,7 @@ export default function CertificateFormModal({
             <FormControl>
               <Input
                 type="file"
+                multiple={isEdit ? false : true}
                 accept={ACCEPT_FILE_TYPES}
                 className="w-full"
                 {...field}

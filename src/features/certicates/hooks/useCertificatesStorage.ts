@@ -5,7 +5,7 @@ import { getPublicUrlFromFile } from "@/utils/getPublicUrlFromFile";
 import useSupabaseBrowser from "@/utils/supabase-browser";
 import { useUpload } from "@supabase-cache-helpers/storage-react-query";
 
-export default function useCertificatesStorage() {
+export default function useCertificatesStorage(){
     const {CERTIFICATES}= STORAGE_KEYS;
 
     const client = useSupabaseBrowser();
@@ -17,17 +17,19 @@ export default function useCertificatesStorage() {
       });
     
     
-    const uploadCertificate = async (certificate: File | null) => {
+    const uploadCertificate = async (certificate: FileList | null) => {
      
-        if (!certificate) return;
+        if (!certificate) return []
 
-        const [file]=await upload(
+        const files =await upload(
          {
-           files: [certificate],
+           files: certificate,
          }
        );
+
+       const paths = files.filter((file)=> Boolean(file.data?.path))
    
-       return getPublicUrlFromFile(file, query);
+       return paths.map((file)=> ({img: getPublicUrlFromFile(file, query) as string})) as Record<string, unknown>[];
     };
     
     const removeCertificate = async (path: string | null) => {
