@@ -17,12 +17,12 @@ import { TABLE_KEYS } from "@/constants/tableKeys";
 
 const CERTIFICATE_COLUMNS = "id,img,created_at";
 
-const { CATEGORIES } = TABLE_KEYS;
+const { CERTIFICATES } = TABLE_KEYS;
 
 export const useGetCertificates = () => {
   const supabase = useSupabaseBrowser();
 
-  const query = supabase.from(CATEGORIES);
+  const query = supabase.from(CERTIFICATES);
 
   return useQuery(query.select(CERTIFICATE_COLUMNS));
 };
@@ -32,7 +32,7 @@ export const useGetCertificates = () => {
 export const useCreateCertificate = () => {
   const client = useSupabaseBrowser();
 
-  const query = client.from(CATEGORIES);
+  const query = client.from(CERTIFICATES);
 
   return useInsertMutation(query as any, ["id"], CERTIFICATE_COLUMNS, {
     onError: () => {
@@ -47,7 +47,7 @@ export const useCreateCertificate = () => {
 export const useUpdateCertificate = () => {
   const client = useSupabaseBrowser();
 
-  const query = client.from(CATEGORIES);
+  const query = client.from(CERTIFICATES);
 
   return useUpdateMutation(query as any, ["id"], CERTIFICATE_COLUMNS, {
     onError: () => {
@@ -64,7 +64,7 @@ export const useDeleteCertificate = () => {
 
   const { removeCertificate } = useCertificatesStorage();
 
-  const query = client.from(CATEGORIES);
+  const query = client.from(CERTIFICATES);
 
   return useDeleteMutation(query as any, ["id"], CERTIFICATE_COLUMNS, {
     onSuccess: async (data) => {
