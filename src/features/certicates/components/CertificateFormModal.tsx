@@ -26,11 +26,12 @@ import {
 } from "@/features/certicates/queries/certificatesQueries";
 
 import { CertificateForm } from "@/features/certicates/form/certificateSchema";
-import useSupabaseBrowser from "@/utils/supabase-browser";
 
-import { CERTIFICATE_TABLE } from "@/features/certicates/constants/certificateTable";
-import { formatFileName } from "@/utils/formatFileName";
 import { getFile } from "@/utils/getFile";
+
+import useCertificatesStorage from "../hooks/useCertificatesStorage";
+
+import { ACCEPT_FILE_TYPES } from "@/constants/acceptFileTypes";
 
 interface Props {
   isEdit: boolean;
@@ -62,47 +63,39 @@ export default function CertificateFormModal({
     setFile(getFile(event));
   };
 
-  const client = useSupabaseBrowser();
+  const { uploadCertificate, updatedCertificate } = useCertificatesStorage();
 
   const onSubmit: SubmitHandler<CertificateForm> = async () => {
-    const query = client.storage.from(CERTIFICATE_TABLE);
-
     if (!file) return;
 
-    const fileName = formatFileName(file.name);
+    if (isEdit && data) {
+      const publicUrl = await updatedCertificate({
+        lastFile: data.img,
+        newFile: file,
+      });
 
-    const { data: imgData } = await query.upload(fileName, file, {
-      cacheControl: "3600",
-    });
-
-    if (imgData) {
-      const {
-        data: { publicUrl },
-      } = query.getPublicUrl(imgData?.path);
-
-      if (isEdit && data) {
-        const lastFile = data.img.split("/").at(-1);
-
-        await update(
-          {
-            id: data.id,
-            img: publicUrl,
-          },
-          {
-            onSuccess: async () => {
-              setOpen(false);
-              await query.remove([`${lastFile}`]);
-            },
-          }
-        );
-      } else {
-        await insert([{ img: publicUrl }], {
-          onSuccess: () => {
+      await update(
+        {
+          id: data.id,
+          img: publicUrl,
+        },
+        {
+          onSuccess: async () => {
             setOpen(false);
           },
-        });
-      }
+        }
+      );
+
+      return;
     }
+
+    const publicUrl = await uploadCertificate(file);
+
+    await insert([{ img: publicUrl }], {
+      onSuccess: () => {
+        setOpen(false);
+      },
+    });
   };
 
   return (
@@ -123,6 +116,7 @@ export default function CertificateFormModal({
             <FormControl>
               <Input
                 type="file"
+                accept={ACCEPT_FILE_TYPES}
                 className="w-full"
                 {...field}
                 onChange={(value) => {

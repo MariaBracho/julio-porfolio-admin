@@ -1,12 +1,14 @@
+import { TABLE_KEYS } from "@/constants/tableKeys";
 import type { TypedSupabaseClient } from "@/types/supabaseClient";
-import { CATEGORY_TABLE } from "../constants/categoryTable";
+
+const { CATEGORIES } = TABLE_KEYS;
 
 export const getCategories = (client: TypedSupabaseClient) => {
   return client
-    .from(CATEGORY_TABLE)
+    .from(CATEGORIES)
     .select("name,id,created_at,icon", { count: "exact" });
 };
 
 export const createCategory = (client: TypedSupabaseClient) => {
-  return client.from(CATEGORY_TABLE);
+  return client.from(CATEGORIES);
 };

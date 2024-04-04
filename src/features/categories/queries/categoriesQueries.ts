@@ -16,8 +16,11 @@ import {
 
 import { TOAST_MESSAGES } from "@/constants/toastMessage";
 
-import { CATEGORY_TABLE } from "@/features/categories/constants/categoryTable";
 import useCategoryStorage from "../hooks/useCategoryStorage";
+
+import { TABLE_KEYS } from "@/constants/tableKeys";
+
+const { CATEGORIES } = TABLE_KEYS;
 
 export const useGetCategories = () => {
   const supabase = useSupabaseBrowser();
@@ -50,28 +53,24 @@ export const useUpdateCategory = () => {
   });
 };
 
-
-
 export const useDeleteCategory = () => {
   const client = useSupabaseBrowser();
 
   const { deleteIcon } = useCategoryStorage();
 
-
-  const query = client.from(CATEGORY_TABLE);
+  const query = client.from(CATEGORIES);
 
   return useDeleteMutation(query as any, ["id"], "id,name,icon", {
-      onSuccess: async (data) => {
-        if (data?.icon && typeof data.icon === "string") {
-          await deleteIcon(data.icon);
-          toast.success(TOAST_MESSAGES.DATA_DELETED);
-        }
-      },
-      onError: (error) => {
-        if (error.code === "23503") {
-          toast.error(TOAST_MESSAGES.NOT_REFERENCE_DATA);
-        }
-      },
-    
+    onSuccess: async (data) => {
+      if (data?.icon && typeof data.icon === "string") {
+        await deleteIcon(data.icon);
+        toast.success(TOAST_MESSAGES.DATA_DELETED);
+      }
+    },
+    onError: (error) => {
+      if (error.code === "23503") {
+        toast.error(TOAST_MESSAGES.NOT_REFERENCE_DATA);
+      }
+    },
   });
 };
