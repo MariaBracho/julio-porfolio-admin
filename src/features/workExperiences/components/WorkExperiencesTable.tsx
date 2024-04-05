@@ -82,7 +82,11 @@ export default function WorkExperiencesTable() {
     {
       accessorKey: "description",
       header: "Descripción",
-      cell: ({ row }) => <div>{row.getValue("description")}</div>,
+      cell: ({ row }) => (
+        <div className="max-w-28">
+          <p className="line-clamp-2">{row.getValue("description")}</p>
+        </div>
+      ),
     },
     {
       accessorKey: "start_date",
