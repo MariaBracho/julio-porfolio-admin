@@ -37,10 +37,11 @@ import {
 import { ProjectForm } from "@/features/projects/form/projectSchema";
 
 import { getThrutyValues } from "@/utils/getThrutyValues";
-import useSupabaseBrowser from "@/utils/supabase-browser";
-import { PROJECT_TABLE } from "../constants/projectTable";
+
 import { getFile } from "@/utils/getFile";
-import { formatFileName } from "@/utils/formatFileName";
+
+import useProjectStorage from "../hooks/useProjectStorage";
+import { ACCEPT_FILE_TYPES } from "@/constants/acceptFileTypes";
 
 interface Props {
   isEdit: boolean;
@@ -55,9 +56,6 @@ export default function ProjectFormModal({
   open = false,
   setOpen,
 }: Props) {
-  const client = useSupabaseBrowser();
-  const query = client.storage.from(PROJECT_TABLE);
-
   const title = isEdit ? "Editar proyecto" : "Crear proyecto";
 
   const form = useProjectForm(data);
@@ -79,95 +77,55 @@ export default function ProjectFormModal({
     setLogo(getFile(event));
   };
 
-  interface updatedProjectFile {
-    publicUrlImg?: string | null;
-    publicUrlLogo?: string | null;
-  }
-
-  const updatedModal = async ({
-    publicUrlImg,
-    publicUrlLogo,
-  }: updatedProjectFile) => {
-    setOpen(false);
-
-    const fileNameImg = data?.img.split("/").at(-1);
-    const fileNameLogo = data?.logo.split("/").at(-1);
-
-    publicUrlImg && (await query.remove([`${fileNameImg}`]));
-    publicUrlLogo && (await query.remove([`${fileNameLogo}`]));
-  };
+  const { uploadFiles, updateFiles } = useProjectStorage();
 
   const onSubmit: SubmitHandler<ProjectForm> = async (values) => {
-    let filePathImg = null;
-    let filePathLogo = null;
-
-    let publicUrlImg: string | null = null;
-    let publicUrlLogo: string | null = null;
-
-    if (img) {
-      const fileNameImg = formatFileName(img.name);
-
-      const { data: imgData } = await query.upload(fileNameImg, img, {
-        cacheControl: "3600",
-      });
-
-      filePathImg = imgData;
-    }
-
-    if (logo) {
-      const fileNameLogo = formatFileName(logo.name);
-
-      const { data: logoData } = await query.upload(fileNameLogo, logo, {
-        cacheControl: "3600",
-      });
-
-      filePathLogo = logoData;
-    }
-
-    if (filePathImg) {
-      const {
-        data: { publicUrl },
-      } = query.getPublicUrl(filePathImg.path);
-
-      publicUrlImg = publicUrl;
-    }
-
-    if (filePathLogo) {
-      const {
-        data: { publicUrl },
-      } = query.getPublicUrl(filePathLogo.path);
-
-      publicUrlLogo = publicUrl;
-    }
-
     if (isEdit && data) {
+      const { urlImg, urlIcon } = await updateFiles({
+        imgFile: img,
+        iconFile: logo,
+      });
+
       await update(
         getThrutyValues({
           ...values,
+          img: urlImg,
+          logo: urlIcon,
           category_id: Number(values.category_id),
-          img: publicUrlImg,
-          logo: publicUrlLogo,
           id: data.id,
-        }),
-        {
-          onSuccess: () => updatedModal({ publicUrlImg, publicUrlLogo }),
-        }
+        })
       );
-    } else {
-      await insert(
-        [
-          {
-            ...values,
-            category_id: Number(values.category_id),
-            img: publicUrlImg,
-            logo: publicUrlLogo,
-          },
-        ],
-        {
-          onSuccess: () => updatedModal({}),
-        }
-      );
+
+      return;
     }
+
+    await insert(
+      [
+        {
+          title: values.title,
+          category_id: Number(values.category_id),
+          url_link: values.url_link,
+          img: null,
+          logo: null,
+        },
+      ],
+      {
+        onSuccess: async (data) => {
+          if (img && logo) {
+            const { urlImg, urlIcon } = await uploadFiles({
+              img,
+              icon: logo,
+            });
+            data &&
+              update({
+                id: data[0].id,
+                img: urlImg,
+                logo: urlIcon,
+              });
+          }
+        },
+      }
+    );
   };
 
   const { data: categories } = useGetCategories();
@@ -188,7 +146,7 @@ export default function ProjectFormModal({
           <FormItem>
             <FormLabel>Titulo</FormLabel>
             <FormControl>
-              <Input id="title" className="w-full" {...field} />
+              <Input className="w-full" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -216,6 +174,7 @@ export default function ProjectFormModal({
             <FormControl>
               <Input
                 type="file"
+                accept={ACCEPT_FILE_TYPES}
                 className="w-full"
                 {...field}
                 onChange={(value) => {
@@ -239,6 +198,7 @@ export default function ProjectFormModal({
                 type="file"
                 id="img"
                 className="w-full"
+                accept={ACCEPT_FILE_TYPES}
                 {...field}
                 onChange={(value) => {
                   field.onChange(value);

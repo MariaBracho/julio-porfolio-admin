@@ -41,9 +41,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import Image from "next/image";
 
-import useSupabaseBrowser from "@/utils/supabase-browser";
-
-import { PROJECT_TABLE } from "@/features/projects/constants/projectTable";
 import { Link1Icon } from "@radix-ui/react-icons";
 
 const ProjectFormModal = dynamic(() => import("./ProjectFormModal"));
@@ -63,24 +60,8 @@ export default function ProjectTable() {
 
   const { mutateAsync: deleteProject } = useDeletePropject();
 
-  const client = useSupabaseBrowser();
-
-  //TODO: add @supabase-cache-helpers/storage-react-query
-
   const deleteProjectHanlder = async (id: number) => {
-    const project = (await deleteProject({ id })) as {
-      logo: string;
-      img: string;
-    };
-
-    if (project) {
-      const fileNameImg = project.img.split("/").at(-1) as string;
-      const fileNameLogo = project.logo.split("/").at(-1) as string;
-
-      await client.storage
-        .from(PROJECT_TABLE)
-        .remove([fileNameImg, fileNameLogo]);
-    }
+    await deleteProject({ id });
   };
 
   const openEditProjectModal = (category: Project) => {
@@ -177,6 +158,7 @@ export default function ProjectTable() {
   const openCreateCategoryModal = () => {
     setIsOpenModal(true);
     setIsEditProject(false);
+    setProjectRow(null);
   };
 
   return (

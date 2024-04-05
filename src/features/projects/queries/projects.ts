@@ -11,9 +11,11 @@ import useSupabaseBrowser from "@/utils/supabase-browser";
 
 import { TOAST_MESSAGES } from "@/constants/toastMessage";
 import { PROJECT_TABLE } from "@/features/projects/constants/projectTable";
+import useProjectStorage from "../hooks/useProjectStorage";
 
 const PROJECT_COLUMNS =
   "id,img,logo,title,url_link,category_id,created_at,categories(name,id)";
+
 
 export const useGetProjects = () => {
   const supabase = useSupabaseBrowser();
@@ -63,9 +65,14 @@ export const useDeletePropject = () => {
 
   const query = client.from(PROJECT_TABLE);
 
+  const {removeFiles}=useProjectStorage()
+
   return useDeleteMutation(query as any, ["id"], PROJECT_COLUMNS, {
-    onSuccess: () => {
+    onSuccess: async (data) => {
       toast.success(TOAST_MESSAGES.DATA_DELETED);
+     if(data?.img && data?.logo && typeof data.img === 'string' && typeof data.logo === 'string'){
+      await  removeFiles([data.img, data.logo ])
+     }
     },
   });
 };
