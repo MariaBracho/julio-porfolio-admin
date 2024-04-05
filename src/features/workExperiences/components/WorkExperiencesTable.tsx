@@ -27,99 +27,72 @@ import {
 
 import { useState } from "react";
 
-import { Project } from "@/features/projects/types/project";
-
 import Action from "@/components/table/Actions";
-
 import dynamic from "next/dynamic";
-import {
-  useDeletePropject,
-  useGetProjects,
-} from "@/features/projects/queries/projects";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { WorkExperience } from "@/features/workExperiences/types/workExperience";
+import { useDeleteWorkExperience, useGetWorkExperiences } from "../queries";
 
-import Image from "next/image";
+const WorkExperienceFormModal = dynamic(
+  () => import("@/features/workExperiences/components/WorkExperienceFormModal")
+);
 
-import { Link1Icon } from "@radix-ui/react-icons";
-
-const ProjectFormModal = dynamic(() => import("./ProjectFormModal"));
-
-export default function ProjectTable() {
+export default function WorkExperiencesTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
 
-  const { data, isLoading } = useGetProjects();
-
   const [isOpenModal, setIsOpenModal] = useState(false);
-  const [isEditProject, setIsEditProject] = useState(false);
+  const [isEditCategory, setIsEditCategory] = useState(false);
 
-  const [projectRow, setProjectRow] = useState<null | Project>(null);
+  const [workExperienceRow, setWorkExperienceRow] =
+    useState<null | WorkExperience>(null);
 
-  const { mutateAsync: deleteProject } = useDeletePropject();
+  const { data, isLoading } = useGetWorkExperiences();
 
-  const deleteProjectHanlder = async (id: number) => {
-    await deleteProject({ id });
+  const { mutateAsync: deleteWorkExperience } = useDeleteWorkExperience();
+
+  const deleteWorkExperienceHandler = async (id: number) => {
+    await deleteWorkExperience({ id });
   };
 
-  const openEditProjectModal = (category: Project) => {
-    setIsEditProject(true);
+  const openEditWorkExperienceModal = (workExperience: WorkExperience) => {
+    setIsEditCategory(true);
     setIsOpenModal(true);
-    setProjectRow(category);
+    setWorkExperienceRow(workExperience);
   };
 
-  const columns: ColumnDef<Project | any>[] = [
+  const columns: ColumnDef<WorkExperience | any>[] = [
     {
       header: "ID",
       accessorKey: "id",
       cell: ({ row }) => <p>{row.getValue("id")}</p>,
     },
     {
-      accessorKey: "img",
-      header: "Foto del proyecto",
-      cell: ({ row }) => (
-        <Image
-          src={row.getValue("img")}
-          alt="img"
-          width={224}
-          height={224}
-          className="h-52 w-52 object-cover"
-        />
-      ),
+      accessorKey: "company",
+      header: "Empresa",
+      cell: ({ row }) => <div>{row.getValue("company")}</div>,
     },
     {
-      accessorKey: "title",
-      header: "Titulo",
-      cell: ({ row }) => <div>{row.getValue("title")}</div>,
+      accessorKey: "rol",
+      header: "Rol",
+      cell: ({ row }) => <div>{row.getValue("rol")}</div>,
     },
     {
-      accessorKey: "logo",
-      header: "Logo",
-      cell: ({ row }) => (
-        <Avatar>
-          <AvatarImage src={row.getValue("logo")} />
-          <AvatarFallback>logo</AvatarFallback>
-        </Avatar>
-      ),
+      accessorKey: "description",
+      header: "Descripción",
+      cell: ({ row }) => <div>{row.getValue("description")}</div>,
     },
     {
-      accessorKey: "categories",
-      header: "Categoría",
-      cell: ({ row }) => <div>{row.original?.categories?.name}</div>,
+      accessorKey: "start_date",
+      header: "Fecha de inicio",
+      cell: ({ row }) => <div>{row.getValue("start_date")}</div>,
     },
     {
-      accessorKey: "url_link",
-      header: "URL",
-      cell: ({ row }) => (
-        <a target="_blank" rel="noopener" href={row.getValue("url_link")}>
-          <div className="flex gap-2 items-center text-sky-500 ">
-            <Link1Icon />
-            <p> Link</p>
-          </div>
-        </a>
-      ),
+      accessorKey: "end_date",
+      header: "Fecha de fin",
+      cell: ({ row }) => <div>{row.getValue("end_date")}</div>,
     },
     {
       id: "actions",
@@ -127,14 +100,16 @@ export default function ProjectTable() {
       cell: ({ row }) => {
         return (
           <Action
-            editCallback={() => openEditProjectModal(row.original)}
-            deleteCallback={() => deleteProjectHanlder(row.original.id)}
+            editCallback={() => openEditWorkExperienceModal(row.original)}
+            deleteCallback={() => deleteWorkExperienceHandler(row.original.id)}
             row={row.original}
           />
         );
       },
     },
   ];
+
+  const CREATE_TEXT_BUTTON = "Agregar experiencia";
 
   const table = useReactTable({
     data: data ?? [],
@@ -157,18 +132,18 @@ export default function ProjectTable() {
 
   const openCreateCategoryModal = () => {
     setIsOpenModal(true);
-    setIsEditProject(false);
-    setProjectRow(null);
+    setIsEditCategory(false);
+    setWorkExperienceRow(null);
   };
 
   return (
     <div className="w-full">
       {isOpenModal && (
-        <ProjectFormModal
-          data={projectRow}
+        <WorkExperienceFormModal
+          data={workExperienceRow}
           open={isOpenModal}
           setOpen={setIsOpenModal}
-          isEdit={isEditProject}
+          isEdit={isEditCategory}
         />
       )}
       <div className="w-full">
@@ -178,16 +153,18 @@ export default function ProjectTable() {
           <div className="w-full">
             <div className="flex items-center  justify-between py-4">
               <Input
-                placeholder="Filtrar proyectos..."
+                placeholder="Filtrar por empresa"
                 value={
-                  (table.getColumn("title")?.getFilterValue() as string) ?? ""
+                  (table.getColumn("company")?.getFilterValue() as string) ?? ""
                 }
                 onChange={(event) =>
-                  table.getColumn("title")?.setFilterValue(event.target.value)
+                  table.getColumn("company")?.setFilterValue(event.target.value)
                 }
                 className="max-w-sm"
               />
-              <Button onClick={openCreateCategoryModal}>Crear Proyecto</Button>
+              <Button onClick={openCreateCategoryModal}>
+                {CREATE_TEXT_BUTTON}
+              </Button>
             </div>
             <div className="rounded-md border">
               <Table>

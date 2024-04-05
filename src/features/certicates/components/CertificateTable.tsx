@@ -121,6 +121,7 @@ export default function CertificateTable() {
   const openCreateCategoryModal = () => {
     setIsOpenModal(true);
     setIsEditCategory(false);
+    setCategoryRow(null);
   };
 
   return (

@@ -50,10 +50,6 @@ export type Database = {
       }
       projects: {
         Row: {
-          categories: {
-            name: string;
-            id: number;
-        } | null;
           category_id: number | null
           created_at: string
           id: number
@@ -89,6 +85,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      workExperiences: {
+        Row: {
+          company: string
+          created_at: string
+          description: string
+          end_date: string | null
+          id: number
+          rol: string
+          start_date: string
+        }
+        Insert: {
+          company: string
+          created_at?: string
+          description: string
+          end_date?: string | null
+          id?: number
+          rol: string
+          start_date: string
+        }
+        Update: {
+          company?: string
+          created_at?: string
+          description?: string
+          end_date?: string | null
+          id?: number
+          rol?: string
+          start_date?: string
+        }
+        Relationships: []
       }
     }
     Views: {

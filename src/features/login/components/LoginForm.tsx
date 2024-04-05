@@ -28,6 +28,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { toast } from "sonner";
 
 export default function Login() {
   const formProps = useLoginForm();
@@ -52,7 +53,7 @@ export default function Login() {
           push("/admin/categories");
         });
     } catch (error) {
-      console.error(error);
+      toast.error("Correo o contraseña incorrectos");
     } finally {
       setIsPending(false);
     }

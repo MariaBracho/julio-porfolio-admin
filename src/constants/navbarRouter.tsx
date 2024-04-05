@@ -11,4 +11,8 @@ export const NAVBAR_ROUTER = [
     label: "Certificados",
     path: "/admin/certificates",
   },
+  {
+    label: "Experiencias Laborales",
+    path: "/admin/work-experiences",
+  },
 ];
