@@ -93,6 +93,7 @@ export type Database = {
           description: string
           end_date: string | null
           id: number
+          isJobFinish: boolean | null
           rol: string
           start_date: string
         }
@@ -102,6 +103,7 @@ export type Database = {
           description: string
           end_date?: string | null
           id?: number
+          isJobFinish?: boolean | null
           rol: string
           start_date: string
         }
@@ -111,6 +113,7 @@ export type Database = {
           description?: string
           end_date?: string | null
           id?: number
+          isJobFinish?: boolean | null
           rol?: string
           start_date?: string
         }

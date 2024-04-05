@@ -15,7 +15,7 @@ import { TABLE_KEYS } from "@/constants/tableKeys";
 
 const { WORK_EXPERIENCES } = TABLE_KEYS;
 
-const PROJECTS_COLUMNS = 'id,end_date,company,start_date,rol,description'
+const PROJECTS_COLUMNS = 'id,end_date,company,start_date,rol,description,isJobFinish'
 
 export const useGetWorkExperiences = () => {
   const client = useSupabaseBrowser();

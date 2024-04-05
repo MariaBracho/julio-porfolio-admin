@@ -90,9 +90,12 @@ export default function WorkExperiencesTable() {
       cell: ({ row }) => <div>{row.getValue("start_date")}</div>,
     },
     {
-      accessorKey: "end_date",
       header: "Fecha de fin",
-      cell: ({ row }) => <div>{row.getValue("end_date")}</div>,
+      cell: ({ row }) => (
+        <div>
+          {row.original.isJobFinish ? row.original.end_date : "Actualidad"}
+        </div>
+      ),
     },
     {
       id: "actions",

@@ -8,13 +8,14 @@ export default function useWorkExperienceForm(
 ) {
   return useForm<WorkExperienceForm>({
     resolver: zodResolver(workExperienceSchema),
-    mode: "onChange",
+    mode: "all",
     defaultValues: {
       company: workExperienceData?.company ?? "",
       rol: workExperienceData?.rol ?? "",
       description: workExperienceData?.description ?? "",
       start_date: workExperienceData?.start_date ?? "",
       end_date: workExperienceData?.end_date ?? "",
+      isJobFinish: !!workExperienceData?.isJobFinish,
     },
   });
 }
