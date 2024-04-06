@@ -28,81 +28,75 @@ import { useState } from "react";
 import Action from "@/components/table/Actions";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { Education } from "../types/educationType";
-import {
-  useDeleteEducation,
-  useGetEducations,
-} from "../queries/educationQueries";
 
-const EducationFormModal = dynamic(
-  () => import("@/features/education/components/EducationFormModal")
+import { Recommendations } from "../types/recommendations";
+import {
+  useDeleteRecommendation,
+  useGetRecommendations,
+} from "../queries/recommendationsQueries";
+
+const RecommendationsFormModal = dynamic(
+  () => import("@/features/recommendations/components/RecommendationsFormModal")
 );
 
-export default function EducationTable() {
+export default function RecommendationsTable() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
-  const { data, isLoading } = useGetEducations();
+  const { data, isLoading } = useGetRecommendations();
 
   const [isOpenModal, setIsOpenModal] = useState(false);
-  const [isEditEducation, setIsEditEducation] = useState(false);
+  const [isEditRecommendation, setIsEditRecommendation] = useState(false);
 
-  const [educationRow, setEducationRow] = useState<null | Education>(null);
+  const [recommendationRow, setRecommendationRow] =
+    useState<null | Recommendations>(null);
 
-  const { mutateAsync: deleteEducation } = useDeleteEducation();
+  const { mutateAsync: deleteRecommendation } = useDeleteRecommendation();
 
-  const deleteEducationHanlder = async (id: number) => {
-    await deleteEducation({ id });
+  const deleteRecommendationHanlder = async (id: number) => {
+    await deleteRecommendation({ id });
   };
 
-  const openEditEducationModal = (education: Education) => {
-    setIsEditEducation(true);
+  const openEditRecommendationModal = (recommendation: Recommendations) => {
+    setIsEditRecommendation(true);
     setIsOpenModal(true);
-    setEducationRow(education);
+    setRecommendationRow(recommendation);
   };
 
-  const CURRENT_DATE_TEXT = "Actualidad";
-
-  const columns: ColumnDef<Education | any>[] = [
+  const columns: ColumnDef<Recommendations | any>[] = [
     {
       header: "ID",
       accessorKey: "id",
       cell: ({ row }) => <p>{row.getValue("id")}</p>,
     },
     {
-      accessorKey: "training",
-      header: "Formación",
-      cell: ({ row }) => <div>{row.getValue("training")}</div>,
+      accessorKey: "username",
+      header: "Usuario",
+      cell: ({ row }) => <div>{row.getValue("username")}</div>,
     },
     {
-      accessorKey: "institution",
-      header: "Institución",
-      cell: ({ row }) => <div>{row.getValue("institution")}</div>,
+      accessorKey: "role",
+      header: "Rol",
+      cell: ({ row }) => <div>{row.getValue("role")}</div>,
     },
     {
-      accessorKey: "start_date",
-      header: "Fecha de inicio",
-      cell: ({ row }) => <div>{row.getValue("start_date")}</div>,
-    },
-    {
-      header: "Fecha de finalización",
+      accessorKey: "description",
+      header: "Descripción",
       cell: ({ row }) => (
-        <div>
-          {row.original.isEducationFinish
-            ? row.original.end_date
-            : CURRENT_DATE_TEXT}
+        <div className="max-w-52">
+          <p className="line-clamp-2">{row.getValue("description")}</p>
         </div>
       ),
     },
     {
-      accessorKey: "logo",
-      header: "Logo de la institución",
+      accessorKey: "profilePicture",
+      header: "Foto de perfil",
       cell: ({ row }) => (
         <Image
-          src={row.getValue("logo") ?? ""}
+          src={row.getValue("profilePicture") ?? ""}
           alt="icon"
           width={24}
           height={24}
-          className="object-cover h-6 w-6"
+          className="object-cover h-6 w-6 rounded-full"
         />
       ),
     },
@@ -112,8 +106,8 @@ export default function EducationTable() {
       cell: ({ row }) => {
         return (
           <Action
-            editCallback={() => openEditEducationModal(row.original)}
-            deleteCallback={() => deleteEducationHanlder(row.original.id)}
+            editCallback={() => openEditRecommendationModal(row.original)}
+            deleteCallback={() => deleteRecommendationHanlder(row.original.id)}
             row={row.original}
           />
         );
@@ -136,18 +130,18 @@ export default function EducationTable() {
 
   const openCreateEducationModal = () => {
     setIsOpenModal(true);
-    setIsEditEducation(false);
-    setEducationRow(null);
+    setIsEditRecommendation(false);
+    setRecommendationRow(null);
   };
 
   return (
     <div className="w-full">
       {isOpenModal && (
-        <EducationFormModal
-          data={educationRow}
+        <RecommendationsFormModal
+          data={recommendationRow}
           open={isOpenModal}
           setOpen={setIsOpenModal}
-          isEdit={isEditEducation}
+          isEdit={isEditRecommendation}
         />
       )}
       <div className="w-full">
@@ -157,21 +151,20 @@ export default function EducationTable() {
           <div className="w-full">
             <div className="flex items-center  justify-between py-4">
               <Input
-                placeholder="Filtrar por institución"
+                placeholder="Filtrar por usuario"
                 value={
-                  (table
-                    .getColumn("institution")
-                    ?.getFilterValue() as string) ?? ""
+                  (table.getColumn("username")?.getFilterValue() as string) ??
+                  ""
                 }
                 onChange={(event) =>
                   table
-                    .getColumn("institution")
+                    .getColumn("username")
                     ?.setFilterValue(event.target.value)
                 }
                 className="max-w-sm"
               />
               <Button onClick={openCreateEducationModal}>
-                Crear Educación
+                Crear recomendación
               </Button>
             </div>
             <div className="rounded-md border">

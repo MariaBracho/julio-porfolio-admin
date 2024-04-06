@@ -12,6 +12,7 @@ import useSupabaseBrowser from "@/utils/supabase-browser";
 import { TOAST_MESSAGES } from "@/constants/toastMessage";
 
 import { TABLE_KEYS } from "@/constants/tableKeys";
+import useEducationStorage from "../hooks/useEducationStorage";
 
 const { EDUCATION } = TABLE_KEYS;
 
@@ -59,9 +60,14 @@ export const useDeleteEducation = () => {
 
   const query = client.from(EDUCATION);
 
+  const {deleteIcon}=useEducationStorage();
+
   return useDeleteMutation(query as any, ["id"], COLUMNS_EDUCATION, {
-    onSuccess: () => {
+    onSuccess: async (data) => {
       toast.success(TOAST_MESSAGES.DATA_DELETED);
+      if(data && data.logo && typeof data.logo === 'string'){
+        await deleteIcon(data.logo);
+     }
     },
     onError: () => {
       toast.error(TOAST_MESSAGES.DATA_DELETED);

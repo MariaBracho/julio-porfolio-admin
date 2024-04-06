@@ -23,4 +23,8 @@ export const NAVBAR_ROUTER = [
     label: "formación profesional",
     path: "/admin/education",
   },
+  {
+    label: "Recomedaciones",
+    path: "/admin/recommendations",
+  },
 ];

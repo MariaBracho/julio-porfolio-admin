@@ -5,4 +5,5 @@ export const TABLE_KEYS = {
     WORK_EXPERIENCES: "workExperiences",
     SKILLS: "skills",
     EDUCATION: "education",
+    RECOMMENDATIONS: "recommendations",
 } as const;
