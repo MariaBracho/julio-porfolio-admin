@@ -21,14 +21,15 @@ export default function SideBar() {
       <ul className="flex w-full flex-col gap-4 font-semibold flex-1">
         {NAVBAR_ROUTER.map(({ label, path }) => {
           return (
-            <li
-              key={path}
-              className={`hover:text-white hover:bg-[#1f2937] ${
-                router === path && "text-white bg-[#1f2937]"
-              } rounded-md p-2 cursor-pointer`}
-            >
-              <Link href={path}>{label}</Link>
-            </li>
+            <Link href={path} key={path}>
+              <li
+                className={`hover:text-white hover:bg-[#1f2937] ${
+                  router === path && "text-white bg-[#1f2937]"
+                } rounded-md p-2 cursor-pointer`}
+              >
+                {label}
+              </li>
+            </Link>
           );
         })}
       </ul>
