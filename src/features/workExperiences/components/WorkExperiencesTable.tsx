@@ -3,8 +3,6 @@
 import {
   ColumnDef,
   ColumnFiltersState,
-  SortingState,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -38,10 +36,7 @@ const WorkExperienceFormModal = dynamic(
 );
 
 export default function WorkExperiencesTable() {
-  const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = useState({});
 
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isEditCategory, setIsEditCategory] = useState(false);
@@ -121,19 +116,13 @@ export default function WorkExperiencesTable() {
   const table = useReactTable({
     data: data ?? [],
     columns,
-    onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
     state: {
-      sorting,
       columnFilters,
-      columnVisibility,
-      rowSelection,
     },
   });
 

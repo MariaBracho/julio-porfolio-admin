@@ -1,4 +1,4 @@
-import NavBar from "@/components/layout/NavBar";
+import SideBar from "@/components/layout/SideBar";
 
 export default async function Layout({
   children,
@@ -6,9 +6,11 @@ export default async function Layout({
   children: React.ReactNode;
 }) {
   return (
-    <div>
-      <NavBar />
-      <main className="p-5">{children}</main>
+    <div className="flex">
+      <SideBar />
+      <main className="p-5 w-full max-h-screen overflow-y-auto">
+        {children}
+      </main>
     </div>
   );
 }

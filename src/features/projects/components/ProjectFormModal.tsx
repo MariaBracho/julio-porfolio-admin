@@ -93,39 +93,37 @@ export default function ProjectFormModal({
           logo: urlIcon,
           category_id: Number(values.category_id),
           id: data.id,
-        })
+        }),
+        {
+          onSuccess: () => {
+            setOpen(false);
+          },
+        }
       );
 
       return;
     }
 
-    await insert(
-      [
+    if (img && logo) {
+      const { urlImg, urlIcon } = await uploadFiles({
+        img,
+        icon: logo,
+      });
+      await insert(
+        [
+          {
+            title: values.title,
+            category_id: Number(values.category_id),
+            url_link: values.url_link,
+            img: urlImg,
+            logo: urlIcon,
+          },
+        ],
         {
-          title: values.title,
-          category_id: Number(values.category_id),
-          url_link: values.url_link,
-          img: null,
-          logo: null,
-        },
-      ],
-      {
-        onSuccess: async (data) => {
-          if (img && logo) {
-            const { urlImg, urlIcon } = await uploadFiles({
-              img,
-              icon: logo,
-            });
-            data &&
-              update({
-                id: data[0].id,
-                img: urlImg,
-                logo: urlIcon,
-              });
-          }
-        },
-      }
-    );
+          onSuccess: () => setOpen(false),
+        }
+      );
+    }
   };
 
   const { data: categories } = useGetCategories();

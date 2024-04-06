@@ -46,10 +46,7 @@ import { Link1Icon } from "@radix-ui/react-icons";
 const ProjectFormModal = dynamic(() => import("./ProjectFormModal"));
 
 export default function ProjectTable() {
-  const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = useState({});
 
   const { data, isLoading } = useGetProjects();
 
@@ -139,19 +136,13 @@ export default function ProjectTable() {
   const table = useReactTable({
     data: data ?? [],
     columns,
-    onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
     state: {
-      sorting,
       columnFilters,
-      columnVisibility,
-      rowSelection,
     },
   });
 

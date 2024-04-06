@@ -8,8 +8,6 @@ import Image from "next/image";
 import {
   ColumnDef,
   ColumnFiltersState,
-  SortingState,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -41,10 +39,7 @@ import {
 const CertificateFormModal = dynamic(() => import("./CertificateFormModal"));
 
 export default function CertificateTable() {
-  const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = useState({});
 
   const { data, isLoading } = useGetCertificates();
 
@@ -102,19 +97,13 @@ export default function CertificateTable() {
   const table = useReactTable({
     data: data ?? [],
     columns,
-    onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
     state: {
-      sorting,
       columnFilters,
-      columnVisibility,
-      rowSelection,
     },
   });
 

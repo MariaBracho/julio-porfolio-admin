@@ -2,6 +2,7 @@
 
 import supabase from "@/utils/supabase-browser";
 import { useRouter } from "next/navigation";
+import { PinLeftIcon } from "@radix-ui/react-icons";
 
 export default function Logout() {
   const { push } = useRouter();
@@ -15,8 +16,12 @@ export default function Logout() {
   };
 
   return (
-    <p onClick={handledLogout} className="cursor-pointer">
-      Logout
-    </p>
+    <div
+      className="w-full flex cursor-pointer items-center gap-2"
+      onClick={handledLogout}
+    >
+      <PinLeftIcon className="h-4 w-4" />
+      <p>Logout</p>
+    </div>
   );
 }
