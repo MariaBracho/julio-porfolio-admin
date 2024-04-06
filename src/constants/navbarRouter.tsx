@@ -15,4 +15,8 @@ export const NAVBAR_ROUTER = [
     label: "Experiencias Laborales",
     path: "/admin/work-experiences",
   },
+  {
+    label: "Skills",
+    path: "/admin/skills",
+  },
 ];

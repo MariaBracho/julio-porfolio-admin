@@ -3,4 +3,5 @@ export const TABLE_KEYS = {
     PROJECTS: "projects",
     CERTIFICATES: "certificate",
     WORK_EXPERIENCES: "workExperiences",
+    SKILLS: "skills",
 } as const;
