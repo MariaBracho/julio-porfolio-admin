@@ -19,4 +19,8 @@ export const NAVBAR_ROUTER = [
     label: "Skills",
     path: "/admin/skills",
   },
+  {
+    label: "formación profesional",
+    path: "/admin/education",
+  },
 ];

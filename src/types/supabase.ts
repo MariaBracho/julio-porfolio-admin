@@ -48,6 +48,39 @@ export type Database = {
         }
         Relationships: []
       }
+      education: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          id: number
+          institution: string | null
+          isEducationFinish: boolean | null
+          logo: string | null
+          start_date: string | null
+          training: string | null
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          id?: number
+          institution?: string | null
+          isEducationFinish?: boolean | null
+          logo?: string | null
+          start_date?: string | null
+          training?: string | null
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          id?: number
+          institution?: string | null
+          isEducationFinish?: boolean | null
+          logo?: string | null
+          start_date?: string | null
+          training?: string | null
+        }
+        Relationships: []
+      }
       projects: {
         Row: {
           category_id: number | null
@@ -85,6 +118,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      recommendations: {
+        Row: {
+          created_at: string
+          description: string
+          id: number
+          profilePicture: string
+          role: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: number
+          profilePicture: string
+          role: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: number
+          profilePicture?: string
+          role?: string
+          username?: string
+        }
+        Relationships: []
       }
       skills: {
         Row: {

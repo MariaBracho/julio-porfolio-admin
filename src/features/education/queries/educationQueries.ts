@@ -13,26 +13,26 @@ import { TOAST_MESSAGES } from "@/constants/toastMessage";
 
 import { TABLE_KEYS } from "@/constants/tableKeys";
 
-const { SKILLS } = TABLE_KEYS;
+const { EDUCATION } = TABLE_KEYS;
 
-const COLUMNS_SKILLS = "id,name";
+const COLUMNS_EDUCATION = "id,training,institution,start_date,end_date,isEducationFinish,logo";
 
-export const useGetSkills = () => {
+export const useGetEducations = () => {
   const client = useSupabaseBrowser();
 
-  const query = client.from(SKILLS).select(COLUMNS_SKILLS);
+  const query = client.from(EDUCATION).select(COLUMNS_EDUCATION, { count: "exact" });
 
   return useQuery(query);
 };
 
 //TODO: fix type any
 
-export const useCreateSKills = () => {
+export const useCreateEducation = () => {
   const client = useSupabaseBrowser();
 
-  const query = client.from(SKILLS);
+  const query = client.from(EDUCATION);
 
-  return useInsertMutation(query as any, ["id"], COLUMNS_SKILLS, {
+  return useInsertMutation(query as any, ["id"], COLUMNS_EDUCATION, {
     onError: () => {
       toast.error(TOAST_MESSAGES.ERROR);
     },
@@ -42,24 +42,24 @@ export const useCreateSKills = () => {
   });
 };
 
-export const useUpdateSKills = () => {
+export const useUpdateEducation = () => {
   const client = useSupabaseBrowser();
 
-  const query = client.from(SKILLS);
+  const query = client.from(EDUCATION);
 
-  return useUpdateMutation(query as any, ["id"], COLUMNS_SKILLS, {
+  return useUpdateMutation(query as any, ["id"], COLUMNS_EDUCATION, {
     onError: () => {
       toast.error(TOAST_MESSAGES.ERROR);
     },
   });
 };
 
-export const useDeleteSKills = () => {
+export const useDeleteEducation = () => {
   const client = useSupabaseBrowser();
 
-  const query = client.from(SKILLS);
+  const query = client.from(EDUCATION);
 
-  return useDeleteMutation(query as any, ["id"], COLUMNS_SKILLS, {
+  return useDeleteMutation(query as any, ["id"], COLUMNS_EDUCATION, {
     onSuccess: () => {
       toast.success(TOAST_MESSAGES.DATA_DELETED);
     },
