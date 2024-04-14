@@ -27,4 +27,8 @@ export const NAVBAR_ROUTER = [
     label: "Recomedaciones",
     path: "/admin/recommendations",
   },
+  {
+    label: "Destacado",
+    path: "/admin/highlight",
+  },
 ];

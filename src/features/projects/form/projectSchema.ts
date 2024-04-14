@@ -15,4 +15,4 @@ export const projectSchema = z.object({
 
 export const projesctEditSchema = projectSchema.partial();
 
-export type ProjectForm = z.infer<typeof projectSchema>;
+export type TProjectForm = z.infer<typeof projectSchema>;

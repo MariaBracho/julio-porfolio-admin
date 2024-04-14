@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import type { Project } from "../types/project";
 import {
-  type ProjectForm,
+  type TProjectForm,
   projectSchema,
   projesctEditSchema,
 } from "./projectSchema";
@@ -12,7 +12,7 @@ import {
 export default function useProjectForm(project?: Project | null) {
   const schema = project ? projesctEditSchema : projectSchema;
 
-  return useForm<ProjectForm>({
+  return useForm<TProjectForm>({
     resolver: zodResolver(schema),
     mode: "onChange",
     defaultValues: {

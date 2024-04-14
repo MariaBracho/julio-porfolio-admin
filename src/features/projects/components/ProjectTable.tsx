@@ -3,8 +3,6 @@
 import {
   ColumnDef,
   ColumnFiltersState,
-  SortingState,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -156,6 +154,7 @@ export default function ProjectTable() {
     <div className="w-full">
       {isOpenModal && (
         <ProjectFormModal
+          isLoading={isLoading}
           data={projectRow}
           open={isOpenModal}
           setOpen={setIsOpenModal}

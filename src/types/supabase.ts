@@ -87,6 +87,7 @@ export type Database = {
           created_at: string
           id: number
           img: string
+          is_highlighted: boolean | null
           logo: string
           title: string | null
           url_link: string
@@ -96,6 +97,7 @@ export type Database = {
           created_at?: string
           id?: number
           img: string
+          is_highlighted?: boolean | null
           logo: string
           title?: string | null
           url_link: string
@@ -105,6 +107,7 @@ export type Database = {
           created_at?: string
           id?: number
           img?: string
+          is_highlighted?: boolean | null
           logo?: string
           title?: string | null
           url_link?: string

@@ -24,7 +24,7 @@ export const useGetProjects = () => {
 
   const query = supabase.from(PROJECTS);
 
-  return useQuery(query.select(PROJECT_COLUMNS, { count: "exact" }));
+  return useQuery(query.select(PROJECT_COLUMNS, { count: "exact" }).eq("is_highlighted", false));
 };
 
 //TODO: fix type any
