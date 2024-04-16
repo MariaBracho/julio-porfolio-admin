@@ -1,8 +1,8 @@
 "use client";
 
 import supabase from "@/utils/supabase-browser";
-import { useRouter } from "next/navigation";
 import { PinLeftIcon } from "@radix-ui/react-icons";
+import { useRouter } from "next/navigation";
 
 export default function Logout() {
   const { push } = useRouter();
@@ -10,8 +10,10 @@ export default function Logout() {
   const supabaseClient = supabase();
 
   const handledLogout = async () => {
+    console.log("Logout");
     await supabaseClient.auth.signOut().then(() => {
       push("/login");
+      console.log("Logged out, susccessfully!");
     });
   };
 
