@@ -6,15 +6,15 @@ import { useGetProjectHighlighted } from "@/features/highlight/services/highligh
 export default function HighlightForm() {
   const { data, isLoading } = useGetProjectHighlighted();
 
-  const isEdit = Boolean(data && data.length > 1);
-
   return (
     <>
-      {data && !isLoading && (
+      {data && !isLoading ? (
         <div className="max-w-lg">
           <p className="text-lg font-bold">Proyecto Detacado</p>
-          <ProjectForm isHighlighted isEdit={isEdit} data={data[0]} />
+          <ProjectForm isHighlighted isEdit={Boolean(data[0])} data={data[0]} />
         </div>
+      ) : (
+        <p>isLoading...</p>
       )}
     </>
   );

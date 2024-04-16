@@ -7,8 +7,8 @@ export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
   const supabase = createMiddlewareClient({ req, res });
 
-  const session = await supabase.auth.getSession();
-  const user = session.data.session?.user;
+  const user = await supabase.auth.getUser()
+
   // if user is signed in and the current path is / redirect the user to /account
   if (user && req.nextUrl.pathname === "/login") {
     return NextResponse.redirect(new URL("/admin/categories", req.url));

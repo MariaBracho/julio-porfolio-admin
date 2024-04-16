@@ -47,7 +47,7 @@ export default function FormModal({
                 {isLoading && (
                   <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                Guardar en modal
+                Guardar
               </Button>
             </DialogFooter>
           </form>
